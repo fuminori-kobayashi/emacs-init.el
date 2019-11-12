@@ -1,8 +1,12 @@
-;;******************************************************************
-;; ctrl-h ‚Å backspace
+;;; init.el --- Emacså€‹äººè¨­å®š
+
+;;; Commentary:
+
+;;; Code:
+;; ctrl-h ã§ backspace
 (global-set-key "\C-h" 'delete-backward-char)
 
-;;; load-path‚Ì’Ç‰ÁŠÖ”
+;;; load-pathã®è¿½åŠ é–¢æ•°
 (defun add-to-load-path (&rest paths)
   (let (path)
     (dolist (path paths paths)
@@ -11,68 +15,111 @@
         (if (fboundp 'normal-top-level-add-subdirs-to-load-path)
             (normal-top-level-add-subdirs-to-load-path))))))
 
-;; load-path‚É’Ç‰Á‚·‚éƒtƒHƒ‹ƒ_
-;; 2‚ÂˆÈãw’è‚·‚éê‡‚ÌŒ` -> (add-to-load-path "elisp" "xxx" "xxx")
-;;(add-to-load-path "elisp")
+(require 'package)
+;; ;; MELPAã‚’è¿½åŠ 
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
-;;; ƒXƒ^[ƒgƒAƒbƒv”ñ•\¦
+;; ;; MELPA-stableã‚’è¿½åŠ 
+;; (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+
+;; ;; Marmaladeã‚’è¿½åŠ 
+;; (add-to-list 'package-archives  '("marmalade" . "http://marmalade-repo.org/packages/") t)
+
+;; ;; Orgã‚’è¿½åŠ 
+;; (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+
+;; ;; åˆæœŸåŒ–
+(package-initialize)
+
+;; load-pathã«è¿½åŠ ã™ã‚‹ãƒ•ã‚©ãƒ«ãƒ€
+;; 2ã¤ä»¥ä¸ŠæŒ‡å®šã™ã‚‹å ´åˆã®å½¢ -> (add-to-load-path "elisp" "xxx" "xxx")
+;; $ mkdir ~/.emacs/elisp
+(add-to-load-path "elisp")
+
+;;; ã‚¹ã‚¿ãƒ¼ãƒˆã‚¢ãƒƒãƒ—éè¡¨ç¤º
 (setq inhibit-startup-screen t)
 
-;;; ƒc[ƒ‹ƒo[”ñ•\¦
-(tool-bar-mode 0)
-
-;;; ƒtƒ@ƒCƒ‹‚Ìƒtƒ‹ƒpƒX‚ğƒ^ƒCƒgƒ‹ƒo[‚É•\¦
+;;; ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ•ãƒ«ãƒ‘ã‚¹ã‚’ã‚¿ã‚¤ãƒˆãƒ«ãƒãƒ¼ã«è¡¨ç¤º
 (setq frame-title-format
       (format "%%f - Emacs@%s" (system-name)))
 
-;;; Windows ‚Å‰p”‚É DejaVu Sans MonoA“ú–{Œê‚ÉMeiryo‚ğw’è
-(when (eq window-system 'w32)
-  (set-face-attribute 'default nil
-                      :family "DejaVu Sans Mono"
-                      :height 100)
-  (set-fontset-font nil 'japanese-jisx0208 (font-spec :family "Meiryo")))
+;;; Windows ã§è‹±æ•°ã« DejaVu Sans Monoã€æ—¥æœ¬èªã«Meiryoã‚’æŒ‡å®š
+;; (when (eq window-system 'w32)
+;;   (set-face-attribute 'default nil
+;;                       :family "DejaVu Sans Mono"
+;;                       :height 100)
+;;   (set-fontset-font nil 'japanese-jisx0208 (font-spec :family "Meiryo")))
 
-;;; ƒoƒbƒNƒAƒbƒv‚ğc‚³‚È‚¢
+;;; ãƒãƒƒã‚¯ã‚¢ãƒƒãƒ—ã‚’æ®‹ã•ãªã„
 (setq make-backup-files nil)
 
-;;; s”Ô†•\¦
+;;; è¡Œç•ªå·è¡¨ç¤º
 (global-linum-mode)
+;; è¡Œç•ªå·
+(line-number-mode t)
+;; åˆ—ç•ªå·
+(column-number-mode t)
 
-;;; •¶šƒR[ƒh
+;;; æ–‡å­—ã‚³ãƒ¼ãƒ‰
 (set-language-environment "Japanese")
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
-(setq file-name-coding-system 'sjis)
 (setq locale-coding-system 'utf-8)
+;;(setq file-name-coding-system 'sjis)
 
-;;; Š‡ŒÊ‚Ì”ÍˆÍ“à‚ğ‹­’²•\¦
+;;----------------
+;; æ‹¬å¼§
+;;----------------
+;;; æ‹¬å¼§ã®ç¯„å›²å†…ã‚’å¼·èª¿è¡¨ç¤º
 (setq show-paren-delay 0)
 (show-paren-mode t)
 (setq show-paren-style 'expression)
-;; Š‡ŒÊ‚Ì”ÍˆÍF
+
+;; æ‹¬å¼§ã®ç¯„å›²è‰²
 (set-face-background 'show-paren-match-face "#804")
 
-;;; ‘I‘ğ—Ìˆæ‚ÌF
+;; ã‹ã£ã“ã®è‡ªå‹•è£œå®Œ
+;;http://ergoemacs.org/emacs/emacs_insert_brackets_by_pair.html
+(electric-pair-mode 1)
+
+;; å·¦æ‹¬å¼§ã®å¾Œã«å³æ‹¬å¼§ãŒå…¥åŠ›ã•ã‚ŒãŸã¨ãã«ã‚«ãƒ¼ã‚½ãƒ«ã‚’æ‹¬å¼§ã®ä¸­ã«ç§»å‹•ã•ã›ã‚‹ãƒã‚¤ãƒŠãƒ¼ãƒ¢ãƒ¼ãƒ‰ cursor-in-brackets.el
+;; http://d.hatena.ne.jp/yascentur/20130526/1369550512
+;; (when (require 'cursor-in-brackets nil t)
+;;   (global-cursor-in-brackets-mode t))
+
+;;----------------
+;; ã‚¤ãƒ³ãƒ‡ãƒ³ãƒˆ
+;;----------------
+
+;; ã‚¿ãƒ–ã«ã‚¹ãƒšãƒ¼ã‚¹ã‚’ä½¿ç”¨ã™ã‚‹
+;; tab width
+(setq-default indent-tabs-mode nil)
+(setq tab-width 2)
+
+;; javascript mode
+(setq js-indent-level 4)
+
+;;----------------
+;; ã‚¤ãƒ³ãƒ‡ãƒ³ãƒˆ
+;;----------------
+
+;;; é¸æŠé ˜åŸŸã®è‰²
 (set-face-background 'region "#36f")
 
 
-;;; Å‹ßg‚Á‚½ƒtƒ@ƒCƒ‹‚ğƒƒjƒ…[‚É•\¦
+;;; æœ€è¿‘ä½¿ã£ãŸãƒ•ã‚¡ã‚¤ãƒ«ã‚’ãƒ¡ãƒ‹ãƒ¥ãƒ¼ã«è¡¨ç¤º
 (recentf-mode 1)
 (setq recentf-max-menu-items 10)
 (setq recentf-max-saved-items 10)
 
-
-;;’Êí‚ÌƒEƒBƒ“ƒhƒE—p‚Ìİ’è
+;;é€šå¸¸ã®ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ç”¨ã®è¨­å®š
 (setq-default truncate-lines t)
-;;ƒEƒBƒ“ƒhƒE‚ğ¶‰E‚É•ªŠ„‚µ‚½‚Æ‚«—p‚Ìİ’è
+;;ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã‚’å·¦å³ã«åˆ†å‰²ã—ãŸã¨ãç”¨ã®è¨­å®š
 (setq-default truncate-partial-width-windows nil)
+;;; ãƒ„ãƒ¼ãƒ«ãƒãƒ¼éè¡¨ç¤º
+;;(tool-bar-mode 0)
 
-;;s”Ô†
-(line-number-mode t)
-;;—ñ”Ô†
-(column-number-mode t)
-
-;; ‰æ–Ê‚Ì‚R•ªŠ„
+;; ç”»é¢ã®ï¼“åˆ†å‰²
 (defun split-window-vertically-n (num_wins)
   (interactive "p")
   (if (= num_wins 2)
@@ -97,46 +144,115 @@
                            (split-window-horizontally-n 3)))
 
 
-;; "<M-kanji> is undefined"‚ğ”ñ•\¦
+;; "<M-kanji> is undefined"ã‚’éè¡¨ç¤º
 (global-set-key [M-kanji] 'ignore)
 
 ;;====================================
-;;; Ü‚è•Ô‚µ•\¦ON/OFF
+;;; æŠ˜ã‚Šè¿”ã—è¡¨ç¤ºON/OFF
 ;;====================================
+(setq truncate-partial-width-windows nil)
 (defun toggle-truncate-lines ()
-  "Ü‚è•Ô‚µ•\¦‚ğƒgƒOƒ‹“®ì‚µ‚Ü‚·."
+  "æŠ˜ã‚Šè¿”ã—è¡¨ç¤ºã‚’ãƒˆã‚°ãƒ«å‹•ä½œã—ã¾ã™."
   (interactive)
   (if truncate-lines
       (setq truncate-lines nil)
     (setq truncate-lines t))
   (recenter))
 
-(global-set-key "\C-c\C-l" 'toggle-truncate-lines) ; Ü‚è•Ô‚µ•\¦ON/OFF
+(global-set-key "\C-c\C-l" 'toggle-truncate-lines) ; æŠ˜ã‚Šè¿”ã—è¡¨ç¤ºON/OFF
 
-;; ¶Š‡ŒÊ‚ÌŒã‚É‰EŠ‡ŒÊ‚ª“ü—Í‚³‚ê‚½‚Æ‚«‚ÉƒJ[ƒ\ƒ‹‚ğŠ‡ŒÊ‚Ì’†‚ÉˆÚ“®‚³‚¹‚éƒ}ƒCƒi[ƒ‚[ƒh cursor-in-brackets.el
-;; http://d.hatena.ne.jp/yascentur/20130526/1369550512
-(when (require 'cursor-in-brackets nil t)
-  (global-cursor-in-brackets-mode t))
+;;
+;; Package setting
+;;
 
+;;-------------------------
+;; WEB mode --- http://web-mode.org/
+;;
+;; [install]
+;; M-x package-install => web-mode
+;;-------------------------
+(require 'web-mode)
+(add-to-list 'auto-mode-alist '("\\.php\\'"   . web-mode))
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.js\\'"   . web-mode))
+(add-to-list 'auto-mode-alist '("\\.css\\'"   . web-mode))
+(defun my-web-mode-hook ()
+  "Hooks for Web mode."
+  ;; HTML element offset indentation
+  (setq web-mode-markup-indent-offset 2)
+  ;; CSS offset indentation
+  (setq web-mode-css-indent-offset 2)
+  ;;Script/code offset indentation (for JavaScript, Java, PHP, Ruby, Go, VBScript, Python, etc.)
+  (setq web-mode-code-indent-offset 4)
+  ;;For <style> parts
+  (setq web-mode-style-padding 2)
+  ;;For <script> parts
+  (setq web-mode-script-padding 2)
+  ;;For multi-line blocks
+  (setq web-mode-block-padding 0)
 
-;;====================================
-;; ƒŠƒ|ƒWƒgƒŠ‚Ì’Ç‰Á
-;; http://mymemo.weby117.com/develop/emacs_10.html
-;;====================================
-(require 'package)
-(add-to-list 'package-archives
-             '("marmalade" . "http://marmalade-repo.org/packages/"))
-(package-initialize)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
- '(custom-enabled-themes (quote (tsdh-dark))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+)
+(add-hook 'web-mode-hook  'my-web-mode-hook)
+
+;;-------------------------------------
+;; flycheck --- https://www.flycheck.org/en/latest/
+;; ç·¨é›†ä¸­ã®lintãƒ„ãƒ¼ãƒ«é€£æº
+;;
+;; [install]
+;; M-x package-list-package => flycheck
+;;-------------------------------------
+(require 'flycheck)
+(add-hook 'after-init-hook #'global-flycheck-mode)
+
+;; disable jshint since we prefer eslint checking
+(setq-default flycheck-disabled-checkers
+  (append flycheck-disabled-checkers
+    '(javascript-jshint)))
+
+;; disable json-jsonlist checking for json files
+(setq-default flycheck-disabled-checkers
+  (append flycheck-disabled-checkers
+          '(json-jsonlist)))
+
+;; customize flycheck temp file prefix
+(setq-default flycheck-temp-prefix ".flycheck")
+
+;; use eslint with web-mode
+;; https://eslint.org/
+;; [install]
+;; sudo npm install -g eslint
+(flycheck-add-mode 'javascript-eslint 'web-mode)
+
+;; use html-tidy whth web-mode
+;; http://www.html-tidy.org/
+;; [install] http://binaries.html-tidy.org/
+;; wget (rpm download url)
+;; sudo rpm -ihv (downloaded rpm filename)
+;; (flycheck-add-mode 'html-tidy 'web-mode)
+
+;;-------------------------------------
+;; Prettier --- https://github.com/prettier/prettier-emacs
+;; script æ•´å½¢
+;;
+;; [install]
+;; shell) sudo npm install -g prettier
+;; emacs) M-x package-install => prettier-js
+;;-------------------------------------
+
+(require 'prettier-js)
+
+;;-------------------------------------
+;; company --- https://company-mode.github.io/
+;; è£œå®Œ
+;;
+;; [install]
+;; M-x package-install => company
+;;-------------------------------------
+(require 'company)
+(global-company-mode) ; å…¨ãƒãƒƒãƒ•ã‚¡ã§æœ‰åŠ¹ã«ã™ã‚‹ 
+(setq company-idle-delay 0) ; ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯0.5
+(setq company-minimum-prefix-length 2) ; ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã¯4
+(setq company-selection-wrap-around t) ; å€™è£œã®ä¸€ç•ªä¸‹ã§ã•ã‚‰ã«ä¸‹ã«è¡Œã“ã†ã¨ã™ã‚‹ã¨ä¸€ç•ªä¸Šã«æˆ»ã‚‹
+
+;;; init.el ends here
+
