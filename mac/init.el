@@ -31,11 +31,6 @@
 ;; ;; 初期化
 (package-initialize)
 
-;; load-pathに追加するフォルダ
-;; 2つ以上指定する場合の形 -> (add-to-load-path "elisp" "xxx" "xxx")
-;; $ mkdir ~/.emacs/elisp
-;;(add-to-load-path "elisp")
-
 ;;; スタートアップ非表示
 (setq inhibit-startup-screen t)
 
@@ -47,13 +42,6 @@
 ;;; ファイルのフルパスをタイトルバーに表示
 (setq frame-title-format
       (format "%%f - Emacs@%s" (system-name)))
-
-;;; Windows で英数に DejaVu Sans Mono、日本語にMeiryoを指定
-;; (when (eq window-system 'w32)
-;;   (set-face-attribute 'default nil
-;;                       :family "DejaVu Sans Mono"
-;;                       :height 100)
-;;   (set-fontset-font nil 'japanese-jisx0208 (font-spec :family "Meiryo")))
 
 ;;; バックアップを残さない
 (setq make-backup-files nil)
@@ -70,7 +58,6 @@
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
 (setq locale-coding-system 'utf-8)
-;;(setq file-name-coding-system 'sjis)
 
 ;;----------------
 ;; 括弧
@@ -121,8 +108,6 @@
 (setq-default truncate-lines t)
 ;;ウィンドウを左右に分割したとき用の設定
 (setq-default truncate-partial-width-windows nil)
-;;; ツールバー非表示
-;;(tool-bar-mode 0)
 
 ;; 画面の３分割
 (defun split-window-vertically-n (num_wins)
@@ -228,14 +213,6 @@
 ;; sudo npm install -g eslint
 (flycheck-add-mode 'javascript-eslint 'web-mode)
 
-;; use html-tidy whth web-mode
-;; http://www.html-tidy.org/
-;; [install] http://binaries.html-tidy.org/
-;; wget (rpm download url)
-;; sudo rpm -ihv (downloaded rpm filename)
-;; (flycheck-add-mode 'html-tidy 'web-mode)
-
-
 ;;-------------------------------------
 ;; Prettier --- https://github.com/prettier/prettier-emacs
 ;; script 整形
@@ -260,7 +237,6 @@
 (setq company-minimum-prefix-length 2) ; デフォルトは4
 (setq company-selection-wrap-around t) ; 候補の一番下でさらに下に行こうとすると一番上に戻る
 
-;;; init.el ends here
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -276,6 +252,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
 ;;
 ;;-------------------------------------
 ;; rjsx-mode
@@ -294,3 +271,25 @@
             (setq js-indent-level 2) ;;スペースは２つ、デフォルトは4
             (setq js2-strict-missing-semi-warning nil))) ;;行末のセミコロンの警告はオフ
 
+;;-------------------------------------
+;; add-node-modules-path
+;;
+;; https://github.com/codesuki/add-node-modules-path
+;;
+;; [install]
+;; M-x package-list-package => add-node-modules-path
+;;-------------------------------------
+
+;; https://github.com/prettier/prettier-emacs#using-node_modulesbinprettier
+(eval-after-load 'web-mode
+  '(progn
+     ;; web-mode
+     (add-hook 'web-mode-hook #'add-node-modules-path)
+     (add-hook 'web-mode-hook #'prettier-js-mode)
+     ;; rjsx-mode
+     (add-hook 'rjsx-mode-hook #'add-node-modules-path)
+     (add-hook 'rjsx-mode-hook #'prettier-js-mode)
+     ))
+
+
+;;; init.el ends here
