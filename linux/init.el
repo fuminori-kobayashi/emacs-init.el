@@ -26,7 +26,7 @@
 ;; (add-to-list 'package-archives  '("marmalade" . "http://marmalade-repo.org/packages/") t)
 
 ;; ;; Orgを追加
-;; (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
 
 ;; ;; 初期化
 (package-initialize)
@@ -34,10 +34,15 @@
 ;; load-pathに追加するフォルダ
 ;; 2つ以上指定する場合の形 -> (add-to-load-path "elisp" "xxx" "xxx")
 ;; $ mkdir ~/.emacs/elisp
-(add-to-load-path "elisp")
+;; (add-to-load-path "elisp")
 
 ;;; スタートアップ非表示
 (setq inhibit-startup-screen t)
+
+;;; toolbar/menubar
+(tool-bar-mode 0)
+(menu-bar-mode 0)
+
 
 ;;; ファイルのフルパスをタイトルバーに表示
 (setq frame-title-format
@@ -176,6 +181,8 @@
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.js\\'"   . web-mode))
 (add-to-list 'auto-mode-alist '("\\.css\\'"   . web-mode))
+(add-to-list 'auto-mode-alist '(".*\\.tsx\\'" . web-mode))
+
 (defun my-web-mode-hook ()
   "Hooks for Web mode."
   ;; HTML element offset indentation
@@ -187,12 +194,18 @@
   ;;For <style> parts
   (setq web-mode-style-padding 2)
   ;;For <script> parts
-  (setq web-mode-script-padding 2)
+  (setq web-mode-script-padding 4)
   ;;For multi-line blocks
   (setq web-mode-block-padding 0)
 
 )
 (add-hook 'web-mode-hook  'my-web-mode-hook)
+(eval-after-load 'web-mode
+  '(progn
+     ;; for React With TypeScript
+     (add-hook 'web-mode-hook #'setup-tide-mode)
+     (add-hook 'web-mode-hook #'add-node-modules-path)
+     (add-hook 'web-mode-hook #'prettier-js-mode)))
 
 ;;-------------------------------------
 ;; flycheck --- https://www.flycheck.org/en/latest/
@@ -254,5 +267,109 @@
 (setq company-minimum-prefix-length 2) ; デフォルトは4
 (setq company-selection-wrap-around t) ; 候補の一番下でさらに下に行こうとすると一番上に戻る
 
-;;; init.el ends here
+;;-------------------------------------
+;; tide --- https://github.com/ananthakumaran/tide
+;; typescript dev env
+;;
+;; [install]
+;; M-x package-list-package => tide
+;;-------------------------------------
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  ;; company is an optional dependency. You have to
+  ;; install it separately via package-install
+  ;; `M-x package-install [ret] company`
+  (company-mode +1)
+)
 
+;; aligns annotation to the right hand side
+(setq company-tooltip-align-annotations t)
+
+;; formats the buffer before saving
+;;(add-hook 'before-save-hook 'tide-format-before-save)
+(add-hook 'typescript-mode-hook #'setup-tide-mode)
+
+(eval-after-load 'typescript-mode
+    '(progn
+       (add-hook 'typescript-mode-hook #'add-node-modules-path)
+       (add-hook 'typescript-mode-hook #'prettier-js-mode)))
+
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(org-agenda-files nil)
+ '(package-selected-packages
+   (quote
+    (xref-js2 dumb-jump js2-mode magit gnu-elpa-keyring-update tide ztree yaml-mode php-mode add-node-modules-path rjsx-mode web-mode prettier-js flycheck company))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+;;
+;;-------------------------------------
+;; rjsx-mode
+;; react
+;;
+;; [install]
+;; M-x package-install => rjsx-mode
+;;-------------------------------------
+
+(add-to-list 'auto-mode-alist '(".*\\.js\\'" . rjsx-mode))
+;;(add-to-list 'auto-mode-alist '(".*\\.tsx\\'" . rjsx-mode))
+(add-to-list 'auto-mode-alist '("components\\/.*\\.js\\'" . rjsx-mode))
+(add-to-list 'auto-mode-alist '("containers\\/.*\\.js\\'" . rjsx-mode))
+(add-hook 'rjsx-mode-hook
+          (lambda ()
+            (setq indent-tabs-mode nil) ;;インデントはタブではなくスペース
+            (setq js-indent-level 2) ;;スペースは２つ、デフォルトは4
+            (setq js2-strict-missing-semi-warning nil))) ;;行末のセミコロンの警告はオフ
+
+(with-eval-after-load 'rjsx-mode
+  (define-key rjsx-mode-map "<" nil)
+  (define-key rjsx-mode-map (kbd "C-d") nil)
+  (define-key rjsx-mode-map ">" nil))
+(eval-after-load 'rjsx-mode
+    '(progn
+       (add-hook 'rjsx-mode-hook #'add-node-modules-path)
+       (add-hook 'rjsx-mode-hook #'prettier-js-mode)))
+
+(add-hook 'rjsx-mode-hook
+          (lambda ()
+            (when (string-equal "js" (file-name-extension buffer-file-name))
+              (setup-tide-mode))))
+;; configure jsx-tide checker to run after your default jsx checker
+;;(flycheck-add-next-checker 'javascript-eslint 'jsx-tide 'append)
+
+
+;;-------------------------------------
+;; php-mode
+;;
+;; [install]
+;; M-x package-list-packages => (select)php-mode
+;;-------------------------------------
+(add-hook 'php-mode-hook
+  '(lambda()
+     (setq tab-width 4)
+     (setq c-basic-offset 4)
+   ))
+
+;;-------------------------------------
+;; dumb-jump
+;;
+;; [install]
+;; M-x package-list-packages => (select)dumb-jump
+;;-------------------------------------
+(add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+(global-set-key (kbd "C-x j") 'dumb-jump-go)
+
+;;; init.el ends here
