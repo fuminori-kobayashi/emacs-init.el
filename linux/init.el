@@ -59,7 +59,7 @@
 (setq make-backup-files nil)
 
 ;;; 行番号表示
-(global-linum-mode)
+(global-linum-mode t)
 ;; 行番号
 (line-number-mode t)
 ;; 列番号
@@ -81,7 +81,7 @@
 (setq show-paren-style 'expression)
 
 ;; 括弧の範囲色
-(set-face-background 'show-paren-match-face "#804")
+(set-face-background 'show-paren-match "#5183b3")
 
 ;; かっこの自動補完
 ;;http://ergoemacs.org/emacs/emacs_insert_brackets_by_pair.html
@@ -169,6 +169,11 @@
 ;;
 ;; Package setting
 ;;
+
+;; 共通
+;; add-node-modules-path
+;; [install]
+;; M-x package-install => add-node-modules-path
 
 ;;-------------------------
 ;; WEB mode --- http://web-mode.org/
@@ -262,7 +267,7 @@
 ;; M-x package-install => company
 ;;-------------------------------------
 (require 'company)
-(global-company-mode) ; 全バッファで有効にする 
+(global-company-mode) ; 全バッファで有効にする
 (setq company-idle-delay 0) ; デフォルトは0.5
 (setq company-minimum-prefix-length 2) ; デフォルトは4
 (setq company-selection-wrap-around t) ; 候補の一番下でさらに下に行こうとすると一番上に戻る
@@ -298,7 +303,6 @@
     '(progn
        (add-hook 'typescript-mode-hook #'add-node-modules-path)
        (add-hook 'typescript-mode-hook #'prettier-js-mode)))
-
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -358,10 +362,10 @@
 ;; M-x package-list-packages => (select)php-mode
 ;;-------------------------------------
 (add-hook 'php-mode-hook
-  '(lambda()
+  (lambda()
      (setq tab-width 4)
-     (setq c-basic-offset 4)
    ))
+(add-to-list 'auto-mode-alist '(".*\\.php\\'" . php-mode))
 
 ;;-------------------------------------
 ;; dumb-jump
