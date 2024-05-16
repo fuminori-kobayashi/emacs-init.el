@@ -1,7 +1,16 @@
+# for tmux v3.x
+# github https://github.com/tmux/tmux
+# manual page https://man.openbsd.org/tmux
+
+# 即時適用
+# $ tmux source ~/.tmux.conf
+
 # prefixキーをC-qに変更
 set -g prefix C-j
 unbind C-b
 
+# pane number 表示時間 (C-q)
+set display-panes-time 3000
 
 # tmuxを256色表示できるようにする
 set-option -g default-terminal screen-256color
@@ -16,5 +25,19 @@ set-option -g status-bg colour26
 
 # border
 set -g pane-border-lines heavy
-set -g pane-border-style "fg=blue,bg=black"
-set -g pane-active-border-style "fg=green,bg=white"
+set -g pane-border-style 'bg=color237,fg=color172'
+set -g pane-active-border-style 'bg=color024,fg=color075'
+
+# background
+set -g window-style 'bg=color237,fg=color250'
+set -g window-active-style 'bg=black,fg=color231'
+
+# popup (v3.2 or later)
+# 参考 https://tech.visasq.com/introduce-tmux-powerful-features
+bind C-p popup -xC -yC -w90% -h95% -E -d "#{pane_current_path}" '\
+  if [ popup = $(tmux display -p -F "#{session_name}") ]; then \
+    tmux detach-client ; \
+  else \
+    tmux attach -c $(tmux display -p -F "#{pane_current_path}") -t popup || tmux new -s popup ; \
+  fi \
+'
