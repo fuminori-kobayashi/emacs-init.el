@@ -10,7 +10,7 @@ set -g prefix C-j
 unbind C-b
 
 # pane number 表示時間 (C-q)
-set display-panes-time 3000
+set -g display-panes-time 3000
 
 # tmuxを256色表示できるようにする
 set-option -g default-terminal screen-256color
