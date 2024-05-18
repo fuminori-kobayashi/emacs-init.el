@@ -59,7 +59,8 @@
 (setq make-backup-files nil)
 
 ;;; 行番号表示
-(global-linum-mode t)
+(global-display-line-numbers-mode t)
+
 ;; 行番号
 (line-number-mode t)
 ;; 列番号
