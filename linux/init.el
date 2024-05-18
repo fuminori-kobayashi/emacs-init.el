@@ -375,5 +375,6 @@
 ;;-------------------------------------
 (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
 (global-set-key (kbd "C-x j") 'dumb-jump-go)
+(global-set-key (kbd "C-x g") 'grep-find)
 
 ;;; init.el ends here
