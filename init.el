@@ -40,7 +40,7 @@
 (setq inhibit-startup-screen t)
 
 ;;; toolbar/menubar
-;;(tool-bar-mode 0)
+(tool-bar-mode 0)
 (menu-bar-mode 0)
 
 
@@ -376,9 +376,19 @@
 ;;-------------------------------------
 (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
 (global-set-key (kbd "C-x j") 'dumb-jump-go)
-(setq dumb-jump-force-searcher 'rg)
-;;(setq dumb-jump-debug t)
-
 (global-set-key (kbd "C-x g") 'grep-find)
+
+;;-------------------------------------
+;; copilot-mode
+;; https://github.com/copilot-emacs/copilot.el
+;; [install]
+;; M-x package-list-packages => (select)copilot
+;;-------------------------------------
+(require 'copilot)
+(define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion-by-word)
+(define-key copilot-completion-map (kbd "<backtab>") 'copilot-accept-completion)
+
+(add-hook 'javascript-mode-hook 'copilot-mode)
+(add-hook 'typescript-mode-hook 'copilot-mode)
 
 ;;; init.el ends here
