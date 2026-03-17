@@ -42,4 +42,4 @@ bind C-p popup -xC -yC -w90% -h95% -E -d "#{pane_current_path}" '\
   fi \
 '
 # mouse
-set -g mouse on
+# set -g mouse on
