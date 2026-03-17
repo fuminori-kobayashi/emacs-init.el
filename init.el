@@ -391,4 +391,19 @@
 (add-hook 'javascript-mode-hook 'copilot-mode)
 (add-hook 'typescript-mode-hook 'copilot-mode)
 
+;; -----------------------------
+;; Auto-revert (auto-update buffers when files change)
+;; -----------------------------
+;; Enable global auto-revert so buffers reflect external file changes
+(global-auto-revert-mode 1)                       ;; 全バッファで自動リバート有効
+(setq auto-revert-verbose nil)                   ;; ステータスメッセージを抑制
+(setq auto-revert-use-notify t)                  ;; inotify 等のファイル通知を利用（Linux）
+(setq global-auto-revert-non-file-buffers t)     ;; dired 等も自動更新
+(setq auto-revert-remote-files nil)              ;; TRAMP/リモートは無効（必要なら t に）
+
+;; If you prefer auto-reloading tails (logs), use auto-revert-tail-mode on those buffers
+;; e.g. (add-hook 'some-log-mode-hook 'auto-revert-tail-mode)
+
+;; End Auto-revert settings
+
 ;;; init.el ends here
