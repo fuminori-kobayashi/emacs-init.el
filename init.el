@@ -171,11 +171,6 @@
 ;; Package setting
 ;;
 
-;; 共通
-;; add-node-modules-path
-;; [install]
-;; M-x package-install => add-node-modules-path
-
 ;;-------------------------
 ;; WEB mode --- http://web-mode.org/
 ;;
@@ -210,7 +205,6 @@
   '(progn
      ;; for React With TypeScript
      (add-hook 'web-mode-hook #'setup-tide-mode)
-     (add-hook 'web-mode-hook #'add-node-modules-path)
      (add-hook 'web-mode-hook #'prettier-js-mode)))
 
 ;;-------------------------------------
@@ -259,6 +253,8 @@
 ;;-------------------------------------
 
 (require 'prettier-js)
+;; search for the local prettier executable in node_modules/.bin.
+(setq prettier-js-use-modules-bin t)
 
 ;;-------------------------------------
 ;; company --- https://company-mode.github.io/
@@ -302,7 +298,6 @@
 
 (eval-after-load 'typescript-mode
     '(progn
-       (add-hook 'typescript-mode-hook #'add-node-modules-path)
        (add-hook 'typescript-mode-hook #'prettier-js-mode)))
 
 (custom-set-variables
@@ -313,7 +308,7 @@
  '(org-agenda-files nil)
  '(package-selected-packages
    (quote
-    (xref-js2 dumb-jump js2-mode magit gnu-elpa-keyring-update tide ztree yaml-mode php-mode add-node-modules-path rjsx-mode web-mode prettier-js flycheck company))))
+    (xref-js2 dumb-jump js2-mode magit gnu-elpa-keyring-update tide ztree yaml-mode php-mode rjsx-mode web-mode prettier-js flycheck company))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -345,7 +340,6 @@
   (define-key rjsx-mode-map ">" nil))
 (eval-after-load 'rjsx-mode
     '(progn
-       (add-hook 'rjsx-mode-hook #'add-node-modules-path)
        (add-hook 'rjsx-mode-hook #'prettier-js-mode)))
 
 (add-hook 'rjsx-mode-hook
