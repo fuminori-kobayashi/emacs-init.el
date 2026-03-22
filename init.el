@@ -171,6 +171,18 @@
 ;; Package setting
 ;;
 
+;; 共通
+;; add-node-modules-path
+;; [install]
+;; M-x package-install => add-node-modules-path
+
+;; DEBUG
+;; (setq add-node-modules-path-debug t)
+
+;; `npm bin` は npm v9以降で廃止のため対策
+;; https://github.com/codesuki/add-node-modules-path/issues/23#issuecomment-1312961383
+(setq add-node-modules-path-command '("echo \"$(npm root)/.bin\""))
+
 ;;-------------------------
 ;; WEB mode --- http://web-mode.org/
 ;;
@@ -205,6 +217,7 @@
   '(progn
      ;; for React With TypeScript
      (add-hook 'web-mode-hook #'setup-tide-mode)
+     (add-hook 'web-mode-hook #'add-node-modules-path) ;; for flycheck
      (add-hook 'web-mode-hook #'prettier-js-mode)))
 
 ;;-------------------------------------
@@ -229,12 +242,6 @@
 
 ;; customize flycheck temp file prefix
 (setq-default flycheck-temp-prefix ".flycheck")
-
-;; use eslint with web-mode
-;; https://eslint.org/
-;; [install]
-;; sudo npm install -g eslint
-(flycheck-add-mode 'javascript-eslint 'web-mode)
 
 ;; use html-tidy whth web-mode
 ;; http://www.html-tidy.org/
@@ -298,6 +305,7 @@
 
 (eval-after-load 'typescript-mode
     '(progn
+       (add-hook 'typescript-mode-hook #'add-node-modules-path) ;; for flycheck
        (add-hook 'typescript-mode-hook #'prettier-js-mode)))
 
 (custom-set-variables
@@ -338,9 +346,11 @@
   (define-key rjsx-mode-map "<" nil)
   (define-key rjsx-mode-map (kbd "C-d") nil)
   (define-key rjsx-mode-map ">" nil))
+
 (eval-after-load 'rjsx-mode
-    '(progn
-       (add-hook 'rjsx-mode-hook #'prettier-js-mode)))
+  '(progn
+     (add-hook 'rjsx-mode-hook #'add-node-modules-path) ;; for flycheck
+     (add-hook 'rjsx-mode-hook #'prettier-js-mode)))
 
 (add-hook 'rjsx-mode-hook
           (lambda ()
