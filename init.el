@@ -105,9 +105,6 @@
 ;; javascript mode
 (setq js-indent-level 4)
 
-;;----------------
-;; インデント
-;;----------------
 
 ;;; 選択領域の色
 (set-face-background 'region "#36f")
@@ -149,6 +146,25 @@
                            (interactive)
                            (split-window-horizontally-n 3)))
 
+;; 分割サイズ調整
+(defvar my/window-resize-map
+  (let ((map (make-sparse-keymap)))
+    ;; (define-key map (kbd "<left>")  #'shrink-window-horizontally) ;; left
+    ;; (define-key map (kbd "<right>") #'enlarge-window-horizontally) ;; right
+    ;; (define-key map (kbd "<up>")    #'enlarge-window) ;; up
+    ;; (define-key map (kbd "<down>")  #'shrink-window) ;; down
+    (define-key map (kbd "C-b")  #'shrink-window-horizontally) ;; left
+    (define-key map (kbd "C-f") #'enlarge-window-horizontally) ;; right
+    (define-key map (kbd "C-p")    #'enlarge-window) ;; up
+    (define-key map (kbd "C-n")  #'shrink-window) ;; down
+    map))
+
+(defun my/window-resize ()
+  (interactive)
+  (message "リサイズ: ←→↑↓ / 他のキーで終了")
+  (set-transient-map my/window-resize-map t))
+
+(global-set-key (kbd "C-c w") #'my/window-resize)
 
 ;; "<M-kanji> is undefined"を非表示
 (global-set-key [M-kanji] 'ignore)
