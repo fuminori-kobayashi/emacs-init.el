@@ -1,9 +1,12 @@
-# for tmux v3.x
+# for tmux v3.2 or later
 # github https://github.com/tmux/tmux
 # manual page https://man.openbsd.org/tmux
 
 # 即時適用
 # $ tmux source ~/.tmux.conf
+
+# mouse は v3.8 以降default on (v3.7 以前でマウスを使いたい場合は以下コメントを外す)
+# set -g mouse on
 
 # prefixキーをC-jに変更
 set -g prefix C-j
