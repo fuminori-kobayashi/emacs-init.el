@@ -25,9 +25,6 @@
 ;; ;; Marmaladeを追加
 ;; (add-to-list 'package-archives  '("marmalade" . "http://marmalade-repo.org/packages/") t)
 
-;; ;; Orgを追加
-(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
-
 ;; ;; 初期化
 (package-initialize)
 
