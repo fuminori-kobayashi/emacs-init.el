@@ -14,14 +14,13 @@ set -g display-panes-time 3000
 
 # tmuxを256色表示できるようにする
 set -g default-terminal screen-256color
-set -g terminal-overrides 'xterm:colors=256'
+set -ga terminal-overrides 'xterm:colors=256'
 
 # status bar
 set -g status-right '[%Y-%m-%d(%a) %H:%M]'
 
 # ステータスバーの色を設定する
-set -g status-fg colour192
-set -g status-bg colour26
+set -g status-style 'fg=colour192,bg=colour26'
 
 # border
 set -g pane-border-lines heavy
