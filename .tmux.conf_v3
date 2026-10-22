@@ -41,5 +41,12 @@ bind C-p popup -xC -yC -w90% -h95% -E -d "#{pane_current_path}" '\
     tmux attach -c $(tmux display -p -F "#{pane_current_path}") -t popup || tmux new -s popup ; \
   fi \
 '
-# mouse
-# set -g mouse on
+
+# clipboard copy (v3.2 or later)
+# macOS
+if-shell 'uname | grep -q Darwin' \
+  "set -sq copy-command 'pbcopy'"
+
+# WSL
+if-shell 'grep -qi microsoft /proc/version 2>/dev/null' \
+  "set -sq copy-command 'clip.exe'"
