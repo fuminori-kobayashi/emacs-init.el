@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Claude Code のプロンプト編集（Ctrl+G）用のエディタ。
+# Claude Code のプロンプト編集（C-x C-e）用のエディタ。
 # tmux の中ならフローティングペイン（new-pane）で emacs を開き、閉じるまで待つ。
 # tmux の外ではそのまま emacs -nw で開く。
 
@@ -8,7 +8,7 @@ if [[ -z "$TMUX" ]]; then
 fi
 
 # Claude Code はエディタを起動する前に自分の画面を消してしまう。
-# tmux の C-g の bind（.tmux.conf）が消される前の画面をバッファに保存しているので、
+# tmux の C-x C-e の bind（.tmux.conf）が消される前の画面をバッファに保存しているので、
 # それを書き戻して、編集中も Claude のペインに元の表示を残す。
 buffer="claude-screen-$TMUX_PANE"
 if [[ -t 1 ]] && screen=$(tmux show-buffer -b "$buffer" 2>/dev/null); then
