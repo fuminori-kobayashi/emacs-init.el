@@ -10,6 +10,16 @@ fi
 # Claude Code はエディタを起動する前に自分の画面を消してしまう。
 # tmux の C-x C-e の bind（.tmux.conf）が消される前の画面をバッファに保存しているので、
 # それを書き戻して、編集中も Claude のペインに元の表示を残す。
+#
+# 画面が消える理由（Claude Code 2.1.311 の本体から読み取った内容）:
+# Claude Code はエディタのコマンド名で GUI エディタかどうかを判定し、起動前の処理を変える。
+# - 名前に code、cursor、windsurf、codium、subl、atom、gedit、notepad を含む（GUI エディタ）:
+#   prepareTerminalForHandoff() でマウスやフォーカスの報告を止めるだけで、画面は残る。
+# - それ以外（このスクリプトもこちら）:
+#   同じ端末で全画面を使う前提で、enterAlternateScreen() が ESC[2J（画面を消す）と ESC[H を書いてから起動する。
+#   消されるのは代替画面（alternate screen）なのでスクロールバックにも残らず、起動してからでは取り戻せない。
+# このスクリプトの名前に gedit などを含めれば GUI エディタと判定されて画面は消されないが、使わない。
+# GUI エディタと判定されると、ファイルを開くだけの場面ではエディタを切り離して起動し、終わるのを待たなくなるため。
 buffer="claude-screen-$TMUX_PANE"
 if [[ -t 1 ]] && screen=$(tmux show-buffer -b "$buffer" 2>/dev/null); then
   tmux delete-buffer -b "$buffer"
@@ -20,10 +30,32 @@ if [[ -t 1 ]] && screen=$(tmux show-buffer -b "$buffer" 2>/dev/null); then
   printf '\e[0m'
 fi
 
-# 閉じたことを wait-for で受け取る（ペインごとに別のチャンネル名にする）
-channel="claude-editor-${TMUX_PANE#%}-$$"
-tmux new-pane -t "$TMUX_PANE" -c "$PWD" -x 50% -y 50% -X 25% -Y 25% \
-  -T ' Claude prompt ' \
-  "emacs -nw ${(q)@}; tmux wait-for -S $channel"
-tmux wait-for "$channel"
+# フローティングペインは Claude のペインの中央に、ペインの半分の大きさで出す。
+# 小さすぎると使いにくいので最小 80x20 にし、ウィンドウからはみ出さないように収める。
+# new-pane の -x -y -X -Y は枠線を含む外側の大きさと位置で、ウィンドウが基準。
+read left top pane_w pane_h win_w win_h <<< "$(tmux display -p -t "$TMUX_PANE" \
+  '#{pane_left} #{pane_top} #{pane_width} #{pane_height} #{window_width} #{window_height}')"
+(( w = pane_w / 2, w < 80 && (w = 80), w > win_w && (w = win_w) ))
+(( h = pane_h / 2, h < 20 && (h = 20), h > win_h && (h = win_h) ))
+(( x = left + (pane_w - w) / 2, x + w > win_w && (x = win_w - w), x < 0 && (x = 0) ))
+(( y = top + (pane_h - h) / 2, y + h > win_h && (y = win_h - h), y < 0 && (y = 0) ))
+
+read pane pane_pid <<< "$(tmux new-pane -P -F '#{pane_id} #{pane_pid}' \
+  -t "$TMUX_PANE" -c "$PWD" -x $w -y $h -X $x -Y $y \
+  -T " Claude prompt (${TMUX_PANE#%}) " \
+  "emacs -nw ${(q)@}")"
+
+# new-pane は閉じるのを待たずに戻るので、ペインがなくなるまで待つ。
+# Emacs を終了したときだけでなく、ペインごと閉じたとき（kill-pane など）も戻れるように、
+# ペインの中の処理に頼らず、tmux にペインがあるかを問い合わせる。
+# （存在しないペインを -t で指定しても display は終了コード 0 で、#{pane_id} が空になる）
+while [[ $(tmux display -p -t "$pane" '#{pane_id}' 2>/dev/null) == "$pane" ]]; do
+  sleep 0.5
+done
+
+# ペインごと閉じると、Emacs にはシグナルが届かず、端末がないまま動き続ける。残っていれば止める。
+if ps -o command= -p "$pane_pid" 2>/dev/null | grep -q emacs; then
+  pkill -HUP -P "$pane_pid"
+  kill -HUP "$pane_pid"
+fi
 tmux select-pane -t "$TMUX_PANE"

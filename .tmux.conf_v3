@@ -29,6 +29,8 @@ set -g status-style 'fg=colour192,bg=colour26'
 set -g pane-border-lines heavy
 set -g pane-border-style 'bg=color237,fg=color172'
 set -g pane-active-border-style 'bg=color024,fg=color075'
+# フローティングペインだけ、枠の上にタイトルを出す (v3.8 以降)
+set -g pane-border-status top-floating
 
 # background
 set -g window-style 'bg=color237,fg=color250'
