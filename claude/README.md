@@ -46,7 +46,10 @@ Claude Code の中だけで効き、普段のシェルの `$EDITOR` / `$VISUAL` 
 
 1. Claude Code のペインで `C-x` を押すと、tmux は `C-x` をそのまま Claude に渡し、次の 1 キーだけ
    `claude-cx` キーテーブルで受ける。`C-e` 以外のキーはふつうに処理される。
-   - Claude Code のペインかどうかは、`pane_current_command` がバージョン番号（例: `2.1.311`）かどうかで判定する。
+   - Claude Code のペインかどうかは、`pane_current_command` で判定する。
+     tmux がこの値を取る方法が OS で違うため、次のどちらかなら Claude Code のペインとみなす。
+     - macOS: 実行ファイルの名前。Claude Code の実体は `~/.local/share/claude/versions/2.1.311` なので、バージョン番号（例: `2.1.311`）になる。
+     - Linux（WSL を含む）: プロセスの `argv[0]`（`/proc/<pid>/cmdline`）。`claude` になる。
 2. 続けて `C-e` が来たら、`capture-pane -e` で Claude の画面を tmux のバッファ
    `claude-screen-<ペインID>` に保存してから、`C-e` を Claude に渡す。
 3. Claude Code は画面を消してから `$VISUAL`（`claude-editor`）を起動する。
@@ -99,5 +102,5 @@ GUI エディタと判定されると、ファイルを開くだけの場面で�
   エディタが起動しなかった場合（プロンプト以外の場面で `C-x C-e` を押したときなど）は残り、
   `choose-buffer`（prefix `=`）で見える。気になるときは `tmux delete-buffer -b claude-screen-<ペインID>` で消す。
 - 名前付きのバッファなので、`paste-buffer`（prefix `]`）で貼り付けられる内容には影響しない。
-- Claude Code のプロセス名がバージョン番号でなくなると、画面の保存が効かなくなる
+- Claude Code のプロセス名がバージョン番号でも `claude` でもなくなると、画面の保存が効かなくなる
   （エディタは開くが、後ろの Claude の画面が空になる）。
