@@ -44,6 +44,17 @@ bind C-p popup -xC -yC -w90% -h95% -E -d "#{pane_current_path}" '\
   fi \
 '
 
+# Claude Code の C-x C-e (外部エディタ) 用
+# Claude Code はエディタを起動する前に画面を消すので、消される前の画面をバッファに保存してから C-e を渡す。
+# 保存した画面は ~/.local/bin/claude-editor が書き戻す。
+# Claude Code のペインは pane_current_command がバージョン番号 (例: 2.1.311) になるので、それで判定する。
+# C-x はそのまま渡し、次の 1 キーだけ claude-cx テーブルで受ける (C-e 以外はふつうに処理される)。
+bind -n C-x if -F '#{m/r:^[0-9.]+$,#{pane_current_command}}' \
+  'send-keys C-x ; switch-client -T claude-cx' \
+  'send-keys C-x'
+bind -T claude-cx C-e \
+  run-shell 'tmux capture-pane -e -t #{pane_id} -b claude-screen-#{pane_id}' \; send-keys C-e
+
 # clipboard copy (v3.2 or later)
 # macOS
 if-shell 'uname | grep -q Darwin' \

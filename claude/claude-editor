@@ -1,0 +1,29 @@
+#!/bin/zsh
+# Claude Code のプロンプト編集（Ctrl+G）用のエディタ。
+# tmux の中ならフローティングペイン（new-pane）で emacs を開き、閉じるまで待つ。
+# tmux の外ではそのまま emacs -nw で開く。
+
+if [[ -z "$TMUX" ]]; then
+  exec emacs -nw "$@"
+fi
+
+# Claude Code はエディタを起動する前に自分の画面を消してしまう。
+# tmux の C-g の bind（.tmux.conf）が消される前の画面をバッファに保存しているので、
+# それを書き戻して、編集中も Claude のペインに元の表示を残す。
+buffer="claude-screen-$TMUX_PANE"
+if [[ -t 1 ]] && screen=$(tmux show-buffer -b "$buffer" 2>/dev/null); then
+  tmux delete-buffer -b "$buffer"
+  # 先頭に戻して消してから、1 行ずつ書く（最後の行の後で改行するとスクロールするので改行しない）
+  nl=$'\n' eol=$'\e[0m\e[K\r\n'
+  printf '\e[H\e[2J'
+  print -rn -- "${screen//$nl/$eol}"
+  printf '\e[0m'
+fi
+
+# 閉じたことを wait-for で受け取る（ペインごとに別のチャンネル名にする）
+channel="claude-editor-${TMUX_PANE#%}-$$"
+tmux new-pane -t "$TMUX_PANE" -c "$PWD" -x 50% -y 50% -X 25% -Y 25% \
+  -T ' Claude prompt ' \
+  "emacs -nw ${(q)@}; tmux wait-for -S $channel"
+tmux wait-for "$channel"
+tmux select-pane -t "$TMUX_PANE"
