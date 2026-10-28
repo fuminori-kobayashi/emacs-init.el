@@ -2,32 +2,19 @@
 # Claude Code のプロンプト編集（C-x C-e）用のエディタ。
 # tmux の中ならフローティングペイン（new-pane）で emacs を開き、閉じるまで待つ。
 # tmux の外ではそのまま emacs -nw で開く。
+#
+# 名前に notepad を含めているのは、Claude Code に GUI エディタと判定させるため
+# （Claude Code 2.1.312 の本体から読み取った内容）。
+# Claude Code はエディタのコマンド名に code、cursor、windsurf、codium、subl、atom、gedit、notepad を
+# 含むかで GUI エディタかどうかを判定し、起動前の処理を変える。
+# - GUI エディタ: prepareTerminalForHandoff() でマウスやフォーカスの報告を止めるだけで、画面は残る。
+# - それ以外: 同じ端末で全画面を使う前提で、enterAlternateScreen() が画面を消してから起動する。
+# プロンプトの編集（C-x C-e）では、どちらでもエディタが終わるまで待つ。
+# ファイルを開くだけの場面（/memory など）では、GUI エディタは端末から切り離して起動し、終わるのを待たない。
+# その場合もフローティングペインは開くが、tmux の外では端末がないので emacs -nw は開けない。
 
 if [[ -z "$TMUX" ]]; then
   exec emacs -nw "$@"
-fi
-
-# Claude Code はエディタを起動する前に自分の画面を消してしまう。
-# tmux の C-x C-e の bind（.tmux.conf）が消される前の画面をバッファに保存しているので、
-# それを書き戻して、編集中も Claude のペインに元の表示を残す。
-#
-# 画面が消える理由（Claude Code 2.1.311 の本体から読み取った内容）:
-# Claude Code はエディタのコマンド名で GUI エディタかどうかを判定し、起動前の処理を変える。
-# - 名前に code、cursor、windsurf、codium、subl、atom、gedit、notepad を含む（GUI エディタ）:
-#   prepareTerminalForHandoff() でマウスやフォーカスの報告を止めるだけで、画面は残る。
-# - それ以外（このスクリプトもこちら）:
-#   同じ端末で全画面を使う前提で、enterAlternateScreen() が ESC[2J（画面を消す）と ESC[H を書いてから起動する。
-#   消されるのは代替画面（alternate screen）なのでスクロールバックにも残らず、起動してからでは取り戻せない。
-# このスクリプトの名前に gedit などを含めれば GUI エディタと判定されて画面は消されないが、使わない。
-# GUI エディタと判定されると、ファイルを開くだけの場面ではエディタを切り離して起動し、終わるのを待たなくなるため。
-buffer="claude-screen-$TMUX_PANE"
-if [[ -t 1 ]] && screen=$(tmux show-buffer -b "$buffer" 2>/dev/null); then
-  tmux delete-buffer -b "$buffer"
-  # 先頭に戻して消してから、1 行ずつ書く（最後の行の後で改行するとスクロールするので改行しない）
-  nl=$'\n' eol=$'\e[0m\e[K\r\n'
-  printf '\e[H\e[2J'
-  print -rn -- "${screen//$nl/$eol}"
-  printf '\e[0m'
 fi
 
 # フローティングペインは Claude のペインの中央に、ペインの半分の大きさで出す。

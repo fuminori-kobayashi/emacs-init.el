@@ -16,18 +16,15 @@ Claude Code CLI でプロンプトを入力中に `C-x C-e` を押すと、tmux 
 
 | ファイル | 置き場所 | 内容 |
 | --- | --- | --- |
-| `claude-editor` | `~/.local/bin/claude-editor` | Claude Code から呼ばれるエディタ |
+| `claude-notepad` | `~/.local/bin/claude-notepad` | Claude Code から呼ばれるエディタ |
 | `keybindings.json` | `~/.claude/keybindings.json` | `C-g` のエディタ起動を外す |
-| `../.tmux.conf_v3` | `~/.tmux.conf` | `C-x C-e` で Claude の画面を保存する bind などを含む |
 
 ## 設定方法
 
 ```sh
-cp claude/claude-editor ~/.local/bin/
-chmod +x ~/.local/bin/claude-editor
+cp claude/claude-notepad ~/.local/bin/
+chmod +x ~/.local/bin/claude-notepad
 cp claude/keybindings.json ~/.claude/keybindings.json   # 既にある場合は中身をマージする
-cp .tmux.conf_v3 ~/.tmux.conf
-tmux source ~/.tmux.conf
 ```
 
 `~/.claude/settings.json` の `env` に次を足す（`<HOME>` は自分のホームディレクトリの絶対パス。`~` は展開されない）。
@@ -35,8 +32,8 @@ Claude Code の中だけで効き、普段のシェルの `$EDITOR` / `$VISUAL` 
 
 ```json
 "env": {
-  "VISUAL": "<HOME>/.local/bin/claude-editor",
-  "EDITOR": "<HOME>/.local/bin/claude-editor"
+  "VISUAL": "<HOME>/.local/bin/claude-notepad",
+  "EDITOR": "<HOME>/.local/bin/claude-notepad"
 }
 ```
 
@@ -57,11 +54,9 @@ Claude Code の中だけで効き、普段のシェルの `$EDITOR` / `$VISUAL` 
 
 ## 注意
 
-- Claude Code はエディタを起動する前に自分の画面を消すので、tmux の bind で消される前の画面を
-  バッファ `claude-screen-<ペインID>` に保存し、`claude-editor` が書き戻してから消している。
-  エディタが起動しなかった場合（プロンプト以外の場面で `C-x C-e` を押したときなど）はバッファが残り、
-  `choose-buffer`（prefix `=`）で見える。気になるときは `tmux delete-buffer -b claude-screen-<ペインID>` で消す。
-  名前付きのバッファなので、`paste-buffer`（prefix `]`）で貼り付けられる内容には影響しない。
-- Claude Code のペインかどうかは、tmux の `pane_current_command` がバージョン番号（macOS）か
-  `claude`（Linux、WSL を含む）かで判定している。どちらでもなくなると画面の保存が効かなくなる
-  （エディタは開くが、後ろの Claude の画面が空になる）。今の値は prefix `:` → `display '#{pane_current_command}'` で確かめられる。
+- 名前に `notepad` を含めているのは、Claude Code に GUI エディタと判定させるため。
+  GUI エディタでないと判定されると、Claude Code はエディタを起動する前に自分の画面を消すので、
+  後ろの Claude のペインが空になる。名前を変えるときは `notepad` を残す（`code` は含めない）。
+- GUI エディタと判定されるので、ファイルを開くだけの場面（`/memory` など）では Claude Code は Emacs の終了を待たず、
+  開いている間も Claude を操作できる。行番号の指定（`+行番号`）は渡されない。
+- tmux の外では、ファイルを開くだけの場面で Emacs が開かない（端末から切り離して起動されるため）。
