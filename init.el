@@ -393,6 +393,10 @@
 ;;-------------------------------------
 (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
 (global-set-key (kbd "C-x j") 'dumb-jump-go)
+;; 検索には ripgrep (rg) を使う。rg のインストールが必要
+;; (macOS: brew install ripgrep / WSL(Ubuntu): sudo apt install ripgrep)
+(setq dumb-jump-force-searcher 'rg)
+
 (global-set-key (kbd "C-x g") 'grep-find)
 
 ;;-------------------------------------
