@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# claude-notepad の display-popup 版。tmux 3.8 未満でフローティングペイン（new-pane）を使えないとき用。
+# tmux 3.3 以降で動く（display-popup の -T を使う）。
+# ポップアップは動かしたり大きさを変えたりできず、開いている間はほかのペインを操作できない。
+# 名前に notepad を含めている理由は claude-notepad と同じ（Claude Code に GUI エディタと判定させて画面を残す）。
+
+if [[ -z "$TMUX" ]]; then
+  exec emacs -nw "$@"
+fi
+
+# ポップアップは Claude のペインの中央に、ペインの半分の大きさで出す（最小 80x20）。
+# display-popup の -x は左端、-y は下端（tmux が高さを引いて上端にする）で、ウィンドウが基準。
+read left top pane_w pane_h win_w win_h <<< "$(tmux display -p -t "$TMUX_PANE" \
+  '#{pane_left} #{pane_top} #{pane_width} #{pane_height} #{window_width} #{window_height}')"
+(( w = pane_w / 2, w < 80 && (w = 80), w > win_w && (w = win_w) ))
+(( h = pane_h / 2, h < 20 && (h = 20), h > win_h && (h = win_h) ))
+(( x = left + (pane_w - w) / 2, x + w > win_w && (x = win_w - w), x < 0 && (x = 0) ))
+(( y = top + (pane_h - h) / 2, y + h > win_h && (y = win_h - h), y < 0 && (y = 0) ))
+
+# 引数は tmux 経由でシェルに渡るので、エスケープしてから渡す。
+printf -v args '%q ' "$@"
+# -E: emacs が終わったらポップアップを閉じる。display-popup はポップアップが閉じるまで戻らないので、待つ処理は要らない。
+# ポップアップを外から閉じた（display-popup -C）ときは、tmux が emacs も止める。
+tmux display-popup -E -t "$TMUX_PANE" -d "$PWD" -w $w -h $h -x $x -y $((y + h)) \
+  -T " Claude prompt (${TMUX_PANE#%}) " \
+  "emacs -nw $args"

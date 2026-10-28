@@ -18,6 +18,7 @@ Claude Code CLI でプロンプトを入力中に `C-x C-e` を押すと、tmux 
 | --- | --- | --- |
 | `claude-notepad` | `~/.local/bin/claude-notepad` | Claude Code から呼ばれるエディタ |
 | `keybindings.json` | `~/.claude/keybindings.json` | `C-g` のエディタ起動を外す |
+| `claude-notepad-popup` | `~/.local/bin/claude-notepad-popup` | tmux 3.8 未満用（補足を参照） |
 
 ## 設定方法
 
@@ -60,3 +61,21 @@ Claude Code の中だけで効き、普段のシェルの `$EDITOR` / `$VISUAL` 
 - GUI エディタと判定されるので、ファイルを開くだけの場面（`/memory` など）では Claude Code は Emacs の終了を待たず、
   開いている間も Claude を操作できる。行番号の指定（`+行番号`）は渡されない。
 - tmux の外では、ファイルを開くだけの場面で Emacs が開かない（端末から切り離して起動されるため）。
+
+## 補足: tmux 3.8 未満で使う
+
+フローティングペインは tmux 3.8 から使える。それより古い tmux（3.3 以降）では、
+`claude-notepad` の代わりに `display-popup` で Emacs を開く `claude-notepad-popup` を使う。
+
+```sh
+cp claude/claude-notepad-popup ~/.local/bin/
+chmod +x ~/.local/bin/claude-notepad-popup
+```
+
+`settings.json` の `VISUAL` / `EDITOR` は `<HOME>/.local/bin/claude-notepad-popup` にする。
+
+フローティングペイン版との違い:
+
+- ポップアップは動かしたり、大きさを変えたりできない。
+- 開いている間は、ほかのペインを操作できない（キーはすべてポップアップに行く）。
+- 枠の `[x]` などのボタンはない。
