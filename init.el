@@ -1,4 +1,4 @@
-;;; init.el --- Emacs個人設定
+;;; init.el --- Emacs個人設定  -*- lexical-binding: t; -*-
 
 ;;; Commentary:
 
