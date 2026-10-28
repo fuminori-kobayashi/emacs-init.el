@@ -54,3 +54,11 @@ if-shell 'uname | grep -q Darwin' \
 # WSL
 if-shell 'grep -qi microsoft /proc/version 2>/dev/null' \
   "set -sq copy-command 'clip.exe'"
+
+# Linux (Wayland, 要 wl-clipboard)
+if-shell '[ -n "$WAYLAND_DISPLAY" ] && command -v wl-copy >/dev/null' \
+  "set -sq copy-command 'wl-copy'"
+
+# マウスで選択して離すとコピーし、選択表示は残す
+bind -T copy-mode    MouseDragEnd1Pane send -X copy-pipe-no-clear
+bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-no-clear
