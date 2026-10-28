@@ -10,7 +10,7 @@ Claude Code CLI でプロンプトを入力中に `C-x C-e` を押すと、tmux 
 ## 前提
 
 - tmux 3.8 以降（フローティングペインを使う）
-- zsh、GNU Emacs（`emacs` が PATH にあること）
+- bash（macOS 標準の 3.2 で動く）、GNU Emacs（`emacs` が PATH にあること）
 
 ## ファイル
 
