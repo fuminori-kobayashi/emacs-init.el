@@ -4,8 +4,11 @@
 # ポップアップは動かしたり大きさを変えたりできず、開いている間はほかのペインを操作できない。
 # 名前に notepad を含めている理由は claude-notepad と同じ（Claude Code に GUI エディタと判定させて画面を残す）。
 
+# 開いたファイルのバッファだけ、最初から折り返して表示する（claude-notepad と同じ）。
+wrap=(--eval '(setq truncate-lines nil)')
+
 if [[ -z "$TMUX" ]]; then
-  exec emacs -nw "$@"
+  exec emacs -nw "$@" "${wrap[@]}"
 fi
 
 # ポップアップは Claude のペインの中央に、ペインの半分の大きさで出す（最小 80x20）。
@@ -18,7 +21,7 @@ read left top pane_w pane_h win_w win_h <<< "$(tmux display -p -t "$TMUX_PANE" \
 (( y = top + (pane_h - h) / 2, y + h > win_h && (y = win_h - h), y < 0 && (y = 0) ))
 
 # 引数は tmux 経由でシェルに渡るので、エスケープしてから渡す。
-printf -v args '%q ' "$@"
+printf -v args '%q ' "$@" "${wrap[@]}"
 # -E: emacs が終わったらポップアップを閉じる。display-popup はポップアップが閉じるまで戻らないので、待つ処理は要らない。
 # ポップアップを外から閉じた（display-popup -C）ときは、tmux が emacs も止める。
 tmux display-popup -E -t "$TMUX_PANE" -d "$PWD" -w $w -h $h -x $x -y $((y + h)) \
