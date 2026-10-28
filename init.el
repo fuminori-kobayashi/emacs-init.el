@@ -170,15 +170,9 @@
 ;;; 折り返し表示ON/OFF
 ;;====================================
 (setq truncate-partial-width-windows nil)
-(defun toggle-truncate-lines ()
-  "折り返し表示をトグル動作します."
-  (interactive)
-  (if truncate-lines
-      (setq truncate-lines nil)
-    (setq truncate-lines t))
-  (recenter))
-
-(global-set-key "\C-c\C-l" 'toggle-truncate-lines) ; 折り返し表示ON/OFF
+;; 標準の toggle-truncate-lines を使う。
+;; C-c C-l は markdown-mode のリンク挿入などメジャーモードが使うので、ユーザー用の C-c l にする。
+(global-set-key (kbd "C-c l") #'toggle-truncate-lines) ; 折り返し表示ON/OFF
 
 ;;
 ;; Package setting
