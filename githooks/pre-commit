@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# コミットする内容に機密情報がないかを Betterleaks で調べる pre-commit フック。
+# 1日に1回、Homebrew で Betterleaks のアップデートを確認し、あれば先にアップデートする。
+#
+# 有効にする: git config core.hooksPath githooks
+# 一時的に飛ばす: git commit --no-verify
+
+set -u
+
+stamp_dir="${XDG_CACHE_HOME:-$HOME/.cache}/betterleaks-hook"
+stamp="$stamp_dir/last-update-check"
+interval=$((24 * 60 * 60))
+
+# アップデートの確認。失敗してもスキャンは続ける。
+update_betterleaks() {
+  command -v brew >/dev/null 2>&1 || return 0
+
+  local now last=0
+  now=$(date +%s)
+  [ -f "$stamp" ] && last=$(cat "$stamp" 2>/dev/null || echo 0)
+  [ $((now - last)) -lt "$interval" ] && return 0
+
+  mkdir -p "$stamp_dir"
+  echo "$now" >"$stamp"
+
+  echo "betterleaks: アップデートを確認しています..." >&2
+  if ! brew update --quiet >/dev/null 2>&1; then
+    echo "betterleaks: brew update に失敗したので、アップデートを飛ばします" >&2
+    return 0
+  fi
+  if [ -n "$(HOMEBREW_NO_AUTO_UPDATE=1 brew outdated --quiet betterleaks 2>/dev/null)" ]; then
+    echo "betterleaks: アップデートします" >&2
+    HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade --quiet betterleaks >&2 ||
+      echo "betterleaks: アップデートに失敗しました。今のバージョンでスキャンします" >&2
+  fi
+}
+
+if ! command -v betterleaks >/dev/null 2>&1 && ! command -v brew >/dev/null 2>&1; then
+  echo "betterleaks が見つかりません。入れてからコミットしてください（飛ばすなら git commit --no-verify）" >&2
+  exit 1
+fi
+
+update_betterleaks
+
+if ! command -v betterleaks >/dev/null 2>&1; then
+  echo "betterleaks: 入っていないので、Homebrew で入れます" >&2
+  HOMEBREW_NO_AUTO_UPDATE=1 brew install --quiet betterleaks >&2 || exit 1
+fi
+
+exec betterleaks git --pre-commit --staged --redact --no-banner --confidence low
