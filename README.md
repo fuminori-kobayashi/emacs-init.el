@@ -1,6 +1,6 @@
 # 個人用設定ファイル
 
-macOS、Linux、WSL (Ubuntu) で使う。
+macOS、Linux、WSL (Ubuntu)、Windows の MSYS2 で使う。MSYS2 で使うときは [MSYS2.md](MSYS2.md) を参照。
 
 | パス | 置き場所 | 内容 |
 | --- | --- | --- |

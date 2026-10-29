@@ -11,6 +11,7 @@ Claude Code CLI でプロンプトを入力中に `C-x C-e` を押すと、tmux 
 
 - tmux 3.8 以降（フローティングペインを使う）
 - bash（macOS 標準の 3.2 で動く）、GNU Emacs（`emacs` が PATH にあること）
+- MSYS2 で使うときは [MSYS2.md](../MSYS2.md#プロンプトを-emacs-で編集する) を参照
 
 ## ファイル
 
