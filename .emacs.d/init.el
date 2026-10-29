@@ -386,7 +386,8 @@
 ;; M-x package-list-packages => (select)dumb-jump
 ;;-------------------------------------
 (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
-(global-set-key (kbd "C-x j") 'dumb-jump-go)
+;; dumb-jump-go は廃止されたので、xref で定義へ飛ぶ（M-. と同じ。M-, で戻る）
+(global-set-key (kbd "C-x j") #'xref-find-definitions)
 ;; 検索には ripgrep (rg) を使う。rg のインストールが必要
 ;; (macOS: brew install ripgrep / WSL(Ubuntu): sudo apt install ripgrep)
 (setq dumb-jump-force-searcher 'rg)
