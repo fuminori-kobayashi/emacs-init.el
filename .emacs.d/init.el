@@ -403,8 +403,9 @@
 (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion-by-word)
 (define-key copilot-completion-map (kbd "<backtab>") 'copilot-accept-completion)
 
-(add-hook 'javascript-mode-hook 'copilot-mode)
-(add-hook 'typescript-mode-hook 'copilot-mode)
+;; 当面使わないので自動では有効にしない（使うときは M-x copilot-mode）
+;; (add-hook 'javascript-mode-hook 'copilot-mode)
+;; (add-hook 'typescript-mode-hook 'copilot-mode)
 
 ;; -----------------------------
 ;; Auto-revert (auto-update buffers when files change)
