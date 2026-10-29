@@ -22,6 +22,10 @@ Windows Terminal で MSYS2 の bash を開き、その中で tmux と Claude Cod
 
 - ripgrep は ucrt64 のパッケージしかない（`pacman -S mingw-w64-ucrt-x86_64-ripgrep`）。
   `~/.bashrc` で PATH の**後ろ**に `/ucrt64/bin` を足す（MSYS2 と同じ名前のコマンドは MSYS2 のものを使うため）。
+  ucrt64 の rg は Windows のプログラムで、結果を Windows 形式のパスで返すので、Emacs の dumb-jump では `init.el` で MSYS2 の形式に直してから読ませている。
+  （dumb-jump の検索を GNU grep にすると、`.gitignore` を見ずに `node_modules` まで探して Emacs が固まる）
+- Emacs の tide は MSYS2 では使わない（`init.el` で切り替えている）。Node.js が Windows 版で MSYS2 形式のパスを読めず、tsserver がファイルを開けないため。
+  JavaScript / TypeScript の定義へのジャンプ（`C-x j`、`M-.`）は dumb-jump で探す。
 - `.tmux.conf` は MSYS2 では、コピーを `/dev/clipboard` に書き（`clip.exe` は日本語が化ける）、`escape-time` を 100ms にする
   （10ms だとマウスのエスケープシーケンスを読み切れず、`MMMM...` がペインに入力される）。
 

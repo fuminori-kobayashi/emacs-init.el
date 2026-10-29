@@ -290,18 +290,20 @@
 ;; [install]
 ;; M-x package-list-package => tide
 ;;-------------------------------------
+;; MSYS2 では使わない。Node.js が Windows 版で MSYS2 形式のパス（/home/...）を読めず、
+;; tsserver がファイルを開けないので、定義へのジャンプも補完も働かない（xref は dumb-jump を使う）。
 (defun setup-tide-mode ()
   (interactive)
-  (tide-setup)
-  (flycheck-mode +1)
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (eldoc-mode +1)
-  (tide-hl-identifier-mode +1)
-  ;; company is an optional dependency. You have to
-  ;; install it separately via package-install
-  ;; `M-x package-install [ret] company`
-  (company-mode +1)
-)
+  (unless (eq system-type 'cygwin)
+    (tide-setup)
+    (flycheck-mode +1)
+    (setq flycheck-check-syntax-automatically '(save mode-enabled))
+    (eldoc-mode +1)
+    (tide-hl-identifier-mode +1)
+    ;; company is an optional dependency. You have to
+    ;; install it separately via package-install
+    ;; `M-x package-install [ret] company`
+    (company-mode +1)))
 
 ;; aligns annotation to the right hand side
 (setq company-tooltip-align-annotations t)
@@ -391,6 +393,18 @@
 ;; 検索には ripgrep (rg) を使う。rg のインストールが必要
 ;; (macOS: brew install ripgrep / WSL(Ubuntu): sudo apt install ripgrep)
 (setq dumb-jump-force-searcher 'rg)
+;; MSYS2 の rg は Windows のプログラムで、結果を Windows 形式のパス（C:/...\...）で返し、dumb-jump がファイルを開けない。
+;; 区切りを / にさせ（MSYS2 は引数の / を C:/msys64/ に変えるので // と書く）、パスを MSYS2 の形式に直してから読ませる。
+;; （gnu-grep に切り替えると .gitignore も除外の指定も見ずに node_modules まで探し、Emacs が固まる）
+(when (eq system-type 'cygwin)
+  (with-eval-after-load 'dumb-jump
+    (setq dumb-jump-rg-search-args (concat dumb-jump-rg-search-args " --path-separator //"))
+    (advice-add 'dumb-jump-parse-rg-response :filter-args
+                (lambda (args)
+                  (cons (replace-regexp-in-string "^[A-Za-z]:/[^:\n]*"
+                                                  #'cygwin-convert-file-name-from-windows
+                                                  (car args) t t)
+                        (cdr args))))))
 
 (global-set-key (kbd "C-x g") 'grep-find)
 
