@@ -7,3 +7,10 @@
 .\#*
 *.elc
 auto-save-list/
+
+# 秘密情報・マシン固有の設定
+.env
+.env.*
+*.local
+*.local.*
+settings.local.json
