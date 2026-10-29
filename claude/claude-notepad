@@ -17,6 +17,21 @@
 # --eval はファイルの後ろに置くと、そのファイルのバッファで評価される。
 wrap=(--eval '(setq truncate-lines nil)')
 
+# MSYS2 / Cygwin では Windows 版の Claude Code から claude-notepad.cmd 経由で呼ばれ、
+# ファイルのパスや TEMP などが Windows 形式（C:\...）で渡ってくる。emacs が読めるように直す。
+# （TEMP などが Windows 形式のままだと、emacs が一時ディレクトリを相対パスとして扱って失敗する）
+if command -v cygpath >/dev/null 2>&1; then
+  args=()
+  for a in "$@"; do
+    [[ $a == [A-Za-z]:[\\/]* ]] && a=$(cygpath -u "$a")
+    args+=("$a")
+  done
+  set -- "${args[@]}"
+  for v in TMPDIR TMP TEMP; do
+    [[ ${!v} == [A-Za-z]:[\\/]* ]] && export "$v=$(cygpath -u "${!v}")"
+  done
+fi
+
 if [[ -z "$TMUX" ]]; then
   exec emacs -nw "$@" "${wrap[@]}"
 fi
@@ -48,8 +63,9 @@ while [[ $(tmux display -p -t "$pane" '#{pane_id}' 2>/dev/null) == "$pane" ]]; d
 done
 
 # ペインごと閉じると、Emacs にはシグナルが届かず、端末がないまま動き続ける。残っていれば止める。
-if ps -o command= -p "$pane_pid" 2>/dev/null | grep -q emacs; then
-  pkill -HUP -P "$pane_pid"
+# （MSYS2 では ps に -o がなく、tmux がペインの emacs を直接起動して閉じると一緒に終わるので、ここには来ない）
+if ps -p "$pane_pid" 2>/dev/null | grep -q emacs; then
+  command -v pkill >/dev/null 2>&1 && pkill -HUP -P "$pane_pid"
   kill -HUP "$pane_pid"
 fi
 tmux select-pane -t "$TMUX_PANE"

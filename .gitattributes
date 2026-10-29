@@ -2,3 +2,5 @@
 githooks/* text eol=lf
 claude/claude-notepad text eol=lf
 claude/claude-notepad-popup text eol=lf
+# バッチファイルは cmd.exe が LF だと誤動作することがあるので CRLF にする
+*.cmd text eol=crlf
