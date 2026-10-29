@@ -1,0 +1,4 @@
+# シェルスクリプトは Windows で checkout しても LF のままにする（CRLF だと shebang が壊れる）
+githooks/* text eol=lf
+claude/claude-notepad text eol=lf
+claude/claude-notepad-popup text eol=lf
